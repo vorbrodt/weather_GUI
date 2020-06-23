@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import requests
 
 class Ui_MainWindow(object):
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(467, 574)
@@ -26,55 +27,81 @@ class Ui_MainWindow(object):
         font.setPointSize(48)
         font.setBold(True)
         font.setWeight(75)
+
         self.label.setFont(font)
         self.label.setAutoFillBackground(False)
         self.label.setStyleSheet("background-color: rgba(0,0,0,0%)");
         self.label.setStyleSheet("color: rgb(255, 255, 255)");
         self.label.setScaledContents(False)
         self.label.setObjectName("label")
+
         self.searchButton = QtWidgets.QPushButton(self.centralwidget)
         self.searchButton.setGeometry(QtCore.QRect(30, 85, 110, 33))
         self.searchButton.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.searchButton.setObjectName("searchButton")
         self.searchBox = QtWidgets.QLineEdit(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+
         self.searchBox.setGeometry(QtCore.QRect(200, 84, 241, 34))
         self.searchBox.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.searchBox.setText("")
         self.searchBox.setObjectName("searchBox")
+
         self.enterCity = QtWidgets.QLabel(self.centralwidget)
         self.enterCity.setStyleSheet("color: rgb(34, 38, 56);")
         self.enterCity.setGeometry(QtCore.QRect(140, 85, 61, 32))
         self.enterCity.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.enterCity.setObjectName("enterCity")
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+
         self.infoFrame = QtWidgets.QFrame(self.centralwidget)
         self.infoFrame.setGeometry(QtCore.QRect(30, 120, 411, 361))
         self.infoFrame.setStyleSheet("background-color: rgb(253, 250, 255);")
         self.infoFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.infoFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.infoFrame.setObjectName("infoFrame")
+
         self.weatherIcon = QtWidgets.QLabel(self.infoFrame)
-        self.weatherIcon.setGeometry(QtCore.QRect(20, 20, 111, 91))
+        self.weatherIcon.setGeometry(QtCore.QRect(10, 20, 111, 91))
         self.weatherIcon.setText("")
         self.weatherIcon.setObjectName("weatherIcon")
+
         self.tempBox = QtWidgets.QLabel(self.infoFrame)
-        self.tempBox.setGeometry(QtCore.QRect(160, 10, 131, 61))
+        self.tempBox.setGeometry(QtCore.QRect(125, 10, 131, 61))
         font = QtGui.QFont()
-        font.setPointSize(30)
+        font.setFamily("Times New Roman")
+        font.setPointSize(20)
         self.tempBox.setFont(font)
         self.tempBox.setText("")
         self.tempBox.setScaledContents(True)
         self.tempBox.setObjectName("tempBox")
+
+        self.detailedInfo = QtWidgets.QLabel(self.infoFrame)
+        self.detailedInfo.setGeometry(QtCore.QRect(240, 10, 161, 141))
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(20)
+        self.detailedInfo.setFont(font)
+        self.detailedInfo.setText("")
+        self.detailedInfo.setObjectName("detailedInfo")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 467, 22))
         self.menubar.setObjectName("menubar")
+
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
         self.menuEdit = QtWidgets.QMenu(self.menubar)
+
         self.menuEdit.setObjectName("menuEdit")
+
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
+
         MainWindow.setStatusBar(self.statusbar)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
@@ -100,12 +127,19 @@ class Ui_MainWindow(object):
         base_url = "http://api.openweathermap.org/data/2.5/weather?"
         Final_url = base_url + "appid=" + API_key + "&q=" + city + "&units=metric"
         json_response = requests.get(Final_url).json()
+        print (json_response)
         if json_response["cod"]==200:
             main = json_response["main"]
             current_temperature = main["temp"]
             self.tempBox.setText(str(current_temperature) + " °C")
             self.weatherIcon.setPixmap(QtGui.QPixmap("sun.png"))
             self.weatherIcon.setScaledContents(True)
+            wind = str(json_response["wind"]["speed"])
+            humidity = str(main["humidity"])
+            pressure = str(main["pressure"])
+            self.detailedInfo.setText("Humidity: " + humidity + "%\n"
+                + "Wind: " + wind + " m/s\n" + "Pressure: " + pressure + " hPa")
+
 
 
 if __name__ == "__main__":
