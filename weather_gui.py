@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import requests
+import base64
 
 class Ui_MainWindow(object):
 
@@ -64,7 +65,7 @@ class Ui_MainWindow(object):
         self.infoFrame.setObjectName("infoFrame")
 
         self.weatherIcon = QtWidgets.QLabel(self.infoFrame)
-        self.weatherIcon.setGeometry(QtCore.QRect(10, 20, 111, 91))
+        self.weatherIcon.setGeometry(QtCore.QRect(10, 10, 111, 111))
         self.weatherIcon.setText("")
         self.weatherIcon.setObjectName("weatherIcon")
 
@@ -82,10 +83,18 @@ class Ui_MainWindow(object):
         self.detailedInfo.setGeometry(QtCore.QRect(240, 10, 161, 141))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
-        font.setPointSize(20)
+        font.setPointSize(16)
         self.detailedInfo.setFont(font)
         self.detailedInfo.setText("")
         self.detailedInfo.setObjectName("detailedInfo")
+
+        self.cityName = QtWidgets.QLabel(self.infoFrame)
+        self.cityName.setGeometry(QtCore.QRect(10, 0, 121, 21))
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(20)
+        self.cityName.setFont(font)
+        self.cityName.setObjectName("CityName")
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -109,7 +118,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-
         self.searchButton.clicked.connect(self.searchCity)
 
     def retranslateUi(self, MainWindow):
@@ -123,24 +131,36 @@ class Ui_MainWindow(object):
 
     def searchCity(self):
         city = self.searchBox.text()
+
         API_key = "87b9acae8fd62ab7bcbd18a7e305feb5" #make script which fetches this
         base_url = "http://api.openweathermap.org/data/2.5/weather?"
         Final_url = base_url + "appid=" + API_key + "&q=" + city + "&units=metric"
         json_response = requests.get(Final_url).json()
-        print (json_response)
+        self.cityName.setText(json_response["name"])
         if json_response["cod"]==200:
             main = json_response["main"]
             current_temperature = main["temp"]
             self.tempBox.setText(str(current_temperature) + " °C")
-            self.weatherIcon.setPixmap(QtGui.QPixmap("sun.png"))
-            self.weatherIcon.setScaledContents(True)
+
+            #setup icons given by the weather API
+            icon_data= self.get_icon_data(json_response)
+            ba = QtCore.QByteArray.fromBase64(icon_data)
+            pixmap = QtGui.QPixmap()
+            if pixmap.loadFromData(ba, "PNG"):
+                self.weatherIcon.setScaledContents(True)
+                self.weatherIcon.setPixmap(pixmap)
+
             wind = str(json_response["wind"]["speed"])
             humidity = str(main["humidity"])
             pressure = str(main["pressure"])
             self.detailedInfo.setText("Humidity: " + humidity + "%\n"
                 + "Wind: " + wind + " m/s\n" + "Pressure: " + pressure + " hPa")
 
-
+    def get_icon_data(self, json_response):
+        icon_id = json_response['weather'][0]['icon']
+        url = 'http://openweathermap.org/img/wn/{icon}.png'.format(icon=icon_id)
+        response = requests.get(url, stream=True)
+        return base64.encodebytes(response.raw.read())
 
 if __name__ == "__main__":
     import sys
