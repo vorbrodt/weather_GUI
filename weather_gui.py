@@ -68,6 +68,9 @@ class Ui_MainWindow(object):
 
         self.weatherIcon = QtWidgets.QLabel(self.infoFrame)
         self.weatherIcon.setGeometry(QtCore.QRect(10, 10, 111, 111))
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(18)
         self.weatherIcon.setText("")
         self.weatherIcon.setObjectName("weatherIcon")
 
@@ -173,75 +176,105 @@ class Ui_MainWindow(object):
         self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
 
     def searchCity(self):
-        city = self.searchBox.text()
+        try:
+            city = self.searchBox.text()
 
-        API_KEY = "87b9acae8fd62ab7bcbd18a7e305feb5" #make script which fetches this
-        base_url = "http://api.openweathermap.org/data/2.5/weather?"
-        Final_url = base_url + "appid=" + API_KEY + "&q=" + city + "&units=metric"
-        json_response = requests.get(Final_url).json()
-        self.get_weather_forecast(API_KEY, city)
-        if json_response["cod"]==200:
-            self.cityName.setText(json_response["name"])
-            main = json_response["main"]
-            current_temperature = main["temp"]
-            self.tempBox.setText(str(current_temperature) + " °C")
+            API_KEY = "87b9acae8fd62ab7bcbd18a7e305feb5" #make script which fetches this
+            base_url = "http://api.openweathermap.org/data/2.5/weather?"
+            Final_url = base_url + "appid=" + API_KEY + "&q=" + city + "&units=metric"
+            json_response = requests.get(Final_url).json()
+            if json_response["cod"]==200:
+                self.get_weather_forecast(API_KEY, city)
+                self.cityName.setText(json_response["name"])
+                main = json_response["main"]
+                current_temperature = main["temp"]
+                self.tempBox.setText(str(current_temperature) + " °C")
 
-            #setup icons given by the weather API
-            self.get_icon_data(json_response, self.weatherIcon)
+                #setup icons given by the weather API
+                self.get_icon_data(json_response, self.weatherIcon)
 
-            wind = str(json_response["wind"]["speed"])
-            humidity = str(main["humidity"])
-            pressure = str(main["pressure"])
-            self.detailedInfo.setText("Humidity: " + humidity + "%\n"
-                + "Wind: " + wind + " m/s\n" + "Pressure: " + pressure + " hPa")
+                wind = str(json_response["wind"]["speed"])
+                humidity = str(main["humidity"])
+                pressure = str(main["pressure"])
+                self.detailedInfo.setText("Humidity: " + humidity + "%\n"
+                    + "Wind: " + wind + " m/s\n" + "Pressure: " + pressure + " hPa")
+            else:
+                self.reset_all()
+                self.weatherIcon.setText("Not a valid city")
+        except:
+            self.reset_all()
+            self.weatherIcon.setText("Not a valid city")
+            print ("An error occured. Please try again!")
 
     def get_weather_forecast(self, api_key, city):
-        base_url = "http://api.openweathermap.org/data/2.5/forecast?"
-        Final_url = base_url + "appid=" + api_key + "&q=" + city + "&units=metric"
-        json_response = requests.get(Final_url).json()
-        current_date = str(datetime.date(datetime.now()))
-        forecast_list = json_response["list"]
-        forcast_dict = {"icon1": self.day1_icon, "icon2": self.day2_icon, "icon3": self.day3_icon,
-            "temp1": self.day1_temp, "temp2": self.day2_temp, "temp3": self.day3_temp,
-            "text1": self.day1_text, "text2": self.day2_text, "text3": self.day3_text}
-        weekdays= ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        count = 0
-        for i in forecast_list:
-            found_date = str(i.get("dt_txt").partition(' ')[0])
-            found_time = (str(i.get("dt_txt").split(' ')[1]))
+        try:
+            base_url = "http://api.openweathermap.org/data/2.5/forecast?"
+            Final_url = base_url + "appid=" + api_key + "&q=" + city + "&units=metric"
+            json_response = requests.get(Final_url).json()
+            current_date = str(datetime.date(datetime.now()))
+            forecast_list = json_response["list"]
+            forcast_dict = {"icon1": self.day1_icon, "icon2": self.day2_icon, "icon3": self.day3_icon,
+                "temp1": self.day1_temp, "temp2": self.day2_temp, "temp3": self.day3_temp,
+                "text1": self.day1_text, "text2": self.day2_text, "text3": self.day3_text}
+            weekdays= ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            count = 0
+            for i in forecast_list:
+                found_date = str(i.get("dt_txt").partition(' ')[0])
+                found_time = (str(i.get("dt_txt").split(' ')[1]))
 
-            if current_date != found_date and "15:00:00"==found_time:
-                count += 1
-                temp = i["main"].get("temp")
+                if current_date != found_date and "15:00:00"==found_time:
+                    count += 1
+                    temp = i["main"].get("temp")
 
-                #set temp for coming days
-                forcast_dict.get("temp"+str(count)).setText(str(temp) + " °C")
+                    #set temp for coming days
+                    forcast_dict.get("temp"+str(count)).setText(str(temp) + " °C")
 
-                #set icon for coming days
-                widget = forcast_dict.get("icon" + str(count))
-                self.get_icon_data(i, widget)
+                    #set icon for coming days
+                    widget = forcast_dict.get("icon" + str(count))
+                    self.get_icon_data(i, widget)
 
-                #set day for coming weather
+                    #set weekday for coming weather
+                    year, month, day = (int(x) for x in found_date.split('-'))
+                    forcast_dict.get("text"+str(count)).setText(weekdays[date(year, month, day).weekday()])
 
-                year, month, day = (int(x) for x in found_date.split('-'))
-                print (str(date(year, month, day).weekday()))
-                forcast_dict.get("text"+str(count)).setText(weekdays[date(year, month, day).weekday()])
-
-                if count == 3:
-                    break
-
-        #pprint.pprint (forecast_list)
+                    if count == 3:
+                        break
+        except:
+            print ("An error occured. Please try again!")
 
     def get_icon_data(self, json_response, widget):
-        icon_id = json_response['weather'][0]['icon']
-        url = 'http://openweathermap.org/img/wn/{icon}.png'.format(icon=icon_id)
-        response = requests.get(url, stream=True)
-        icon_data= base64.encodebytes(response.raw.read())
-        ba = QtCore.QByteArray.fromBase64(icon_data)
-        pixmap = QtGui.QPixmap()
-        if pixmap.loadFromData(ba, "PNG"):
-            widget.setScaledContents(True)
-            widget.setPixmap(pixmap)
+        try:
+            icon_id = json_response['weather'][0]['icon']
+            url = 'http://openweathermap.org/img/wn/{icon}.png'.format(icon=icon_id)
+            response = requests.get(url, stream=True)
+            icon_data= base64.encodebytes(response.raw.read())
+            ba = QtCore.QByteArray.fromBase64(icon_data)
+            pixmap = QtGui.QPixmap()
+            if pixmap.loadFromData(ba, "PNG"):
+                widget.setScaledContents(True)
+                widget.setPixmap(pixmap)
+        except:
+            print ("An error occured. Please try again!")
+
+
+    def reset_all(self):
+        try:
+            empty_pixmap = QtGui.QPixmap()
+            self.day1_icon.setPixmap(empty_pixmap)
+            self.day2_icon.setPixmap(empty_pixmap)
+            self.day3_icon.setPixmap(empty_pixmap)
+            self.day1_temp.setText("")
+            self.day2_temp.setText("")
+            self.day3_temp.setText("")
+            self.day1_text.setText("")
+            self.day2_text.setText("")
+            self.day3_text.setText("")
+            self.weatherIcon.autoFillBackground()
+            self.detailedInfo.setText("")
+            self.tempBox.setText("")
+            self.cityName.setText("")
+        except:
+            print ("An error occured. Please try again!")
 
 if __name__ == "__main__":
     import sys
