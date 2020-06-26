@@ -6,7 +6,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import requests
 import base64
 from datetime import datetime, date
-
+import pprint
 
 """
 Sublcass to Ui_MainWindow which handels all the logic for the GUI
@@ -26,7 +26,6 @@ class Logic(QMainWindow, Ui_MainWindow):
     def searchCity(self):
         try:
             city = self.searchBox.text()
-            print ("City is: " + str(city))
             API_KEY = "87b9acae8fd62ab7bcbd18a7e305feb5" #make script which fetches this
             base_url = "http://api.openweathermap.org/data/2.5/weather?"
             Final_url = base_url + "appid=" + API_KEY + "&q=" + city + "&units=metric"
@@ -52,7 +51,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         except Exception as e:
             self.reset_all()
             self.weatherIcon.setText("Not a valid city")
-            print ("Error: ")
+            print ("Errorwhile searching city: ")
             print (e)
 
     def get_weather_forecast(self, api_key, city):
@@ -89,7 +88,7 @@ class Logic(QMainWindow, Ui_MainWindow):
                     if count == 3:
                         break
         except Exception as e:
-            print ("An error occured. Please try again!!!!!!!!!!!!!!!!!!")
+            print ("Error while getting weather forecast: ")
             print (e)
 
     def get_icon_data(self, json_response, widget):
@@ -104,7 +103,7 @@ class Logic(QMainWindow, Ui_MainWindow):
                 widget.setScaledContents(True)
                 widget.setPixmap(pixmap)
         except Exception as e:
-            print ("!!!!!!!!!!!!!!!!!!")
+            print ("Error while getting icon: ")
             print (e)
 
 
@@ -124,8 +123,9 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.detailedInfo.setText("")
             self.tempBox.setText("")
             self.cityName.setText("")
-        except:
-            print ("An error occured. Please try again!")
+        except Exception as e:
+            print ("Error while resetting all widgets: ")
+            print (e)
 
 if __name__ == "__main__":
     import sys
