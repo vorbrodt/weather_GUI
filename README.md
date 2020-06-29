@@ -1,17 +1,9 @@
 # Weather application
 
-- Get API key from "https://openweathermap.org/" through creating account. Sign in and API key will be found under the tab "API keys"
+- Get API key from "https://openweathermap.org/" through creating account. Sign in and API key will be found under the tab "API keys".
+Then add the personal API key in the logic.py file.
 
-- Run the logic.py file (keep the ... file in the same directory)
-
-
-
-
-
-
-
-
-
+- Run the logic.py file (keep the weather_gui.py file in the same directory)
 
 
 ## Creating desktop application with QT designer on macOS
