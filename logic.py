@@ -37,10 +37,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         try:
             city = self.searchBox.text()
 <<<<<<< HEAD
-            API_KEY = "87b9acae8fd62ab7bcbd18a7e305feb5"
-=======
             API_KEY = "<api_key>"
->>>>>>> 9b81fb9cad064b7ab8c010918ee7e8573b41c341
             base_url = "http://api.openweathermap.org/data/2.5/weather?"
             Final_url = base_url + "appid=" + API_KEY + "&q=" + city + "&units=metric"
             json_response = requests.get(Final_url).json()
