@@ -15,18 +15,28 @@ and Ui_MainWindow = DesignClass (The name of the class that appears in your desi
 See link: https://stackoverflow.com/questions/46544780/qtdesigner-changes-will-be-lost-after-redesign-user-interface
 """
 class Logic(QMainWindow, Ui_MainWindow):
+    """
+    Inheritance from Ui_MainWindow and run setupUi
+    """
     def __init__(self, *args, **kwargs):
         QMainWindow.__init__(self, *args, **kwargs)
         self.setupUi(self)
 
+    """
+    If return tab pressed then search for city
+    """
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
             self.searchCity()
 
+    """
+    Collects data about the weather through a GET request and run
+    get_icon_data and get_weather_forecast function
+    """
     def searchCity(self):
         try:
             city = self.searchBox.text()
-            API_KEY = "<api_key>" #make script which fetches this
+            API_KEY = "87b9acae8fd62ab7bcbd18a7e305feb5"
             base_url = "http://api.openweathermap.org/data/2.5/weather?"
             Final_url = base_url + "appid=" + API_KEY + "&q=" + city + "&units=metric"
             json_response = requests.get(Final_url).json()
@@ -54,6 +64,9 @@ class Logic(QMainWindow, Ui_MainWindow):
             print ("Errorwhile searching city: ")
             print (e)
 
+    """
+    Get the weather at 15:00:00 for the upcoming three days through GET request
+    """
     def get_weather_forecast(self, api_key, city):
         try:
             base_url = "http://api.openweathermap.org/data/2.5/forecast?"
@@ -91,6 +104,9 @@ class Logic(QMainWindow, Ui_MainWindow):
             print ("Error while getting weather forecast: ")
             print (e)
 
+    """
+    Get the weather icon at 15:00:00 for the upcoming three days through GET request
+    """
     def get_icon_data(self, json_response, widget):
         try:
             icon_id = json_response['weather'][0]['icon']
@@ -107,6 +123,9 @@ class Logic(QMainWindow, Ui_MainWindow):
             print (e)
 
 
+    """
+    Resets all widgets all widgets to be empty
+    """
     def reset_all(self):
         try:
             empty_pixmap = QtGui.QPixmap()
