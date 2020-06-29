@@ -10,7 +10,6 @@ Then add the personal API key in the logic.py file.
 
 ```
 pip3 install pyqt5
-
 ```
 
 - Download QT creator (includes QT designer) from: https://www.qt.io/ (download the open-source online version)
