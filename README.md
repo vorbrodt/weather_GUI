@@ -1,6 +1,18 @@
-# weather_GUI
+# Weather application
 
-## How to run on macOS
+- Run the logic.py file (keep the ... file in the same directory)
+
+
+
+
+
+
+
+
+
+
+
+## Creating desktop application with QT designer on macOS
 
 ```
 pip3 install pyqt5
@@ -17,3 +29,4 @@ pip3 install pyqt5
 cd pathTo.ui
 pyuic5 -x nameOf.ui -o desiredName.py
 ```
+
