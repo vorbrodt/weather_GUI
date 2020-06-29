@@ -1,5 +1,7 @@
 # Weather application
 
+- Get API key from "https://openweathermap.org/" through creating account. Sign in and API key will be found under the tab "API keys"
+
 - Run the logic.py file (keep the ... file in the same directory)
 
 
